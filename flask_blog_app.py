@@ -55,5 +55,5 @@ def login():
 # To run the server using python command rather than flask command
 if __name__ == '__main__':
     # Debug True is set to make sure whenever there is change
-    # there will no need of stopping and restarting the server
+    # then we don't need of stopping and restarting the server
     app.run(debug=True)
