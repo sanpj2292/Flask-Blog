@@ -1,5 +1,7 @@
-
-from models import User, Post
+from flask import render_template, url_for, flash, redirect
+from flaskblog import app
+from flaskblog.forms import RegistrationForm, LoginForm
+from flaskblog.models import User, Post
 
 posts = [
     {
@@ -28,7 +30,6 @@ def about():
 @app.route('/register', methods=['GET','POST'])
 def register():
     form = RegistrationForm()
-    print(form.username.errors)
     if form.validate_on_submit():
         flash('User Successfully create: {user}'.format(user=form.username.data), 'success')
         return redirect(url_for('home'))     

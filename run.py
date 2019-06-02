@@ -1,4 +1,4 @@
-
+from flaskblog import app
 
 # To run the server using python command rather than flask command
 if __name__ == '__main__':
