@@ -1,3 +1,4 @@
+# Ugly import of routes has been moved from __init__.py file to here
 from flaskblog import app, routes
 
 # To run the server using python command rather than flask command
