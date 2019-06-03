@@ -16,5 +16,6 @@ bcrypt = Bcrypt(app)
 login_manager = LoginManager(app)
 # The login is the function-name of the route not the view-name
 login_manager.login_view = 'login'
+login_manager.login_message_category = 'info'
 
 db = SQLAlchemy(app)
