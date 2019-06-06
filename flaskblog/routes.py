@@ -1,8 +1,12 @@
 from flask import render_template, url_for, flash, redirect, request
 from flaskblog import app, bcrypt, db
-from flaskblog.forms import RegistrationForm, LoginForm
+from flaskblog.forms import RegistrationForm, LoginForm, UpdateAccountForm
 from flaskblog.models import User, Post
 from flask_login import login_user, current_user, logout_user, login_required
+import secrets
+import os
+from PIL import Image
+
 
 posts = [
     {
@@ -58,8 +62,38 @@ def logout():
     logout_user()
     return redirect(url_for('home'))
 
-@app.route('/account')
+def save_picture(form_pic):
+    rand_hex = secrets.token_hex(8)
+    _, fext = os.path.splitext(form_pic.filename)
+    pic_fnm = rand_hex + fext
+    pic_path = os.path.join(app.root_path, 'static/profile_pix', pic_fnm)
+    out_sz = (125, 125)
+    img = Image.open(form_pic)
+    img.thumbnail(out_sz)
+    img.save(pic_path)
+    # Deleting the old image
+    os.remove(os.path.join(app.root_path, 'static/profile_pix', current_user.image_file))
+    return pic_fnm
+
+
+@app.route('/account', methods=['GET','POST'])
 @login_required
 def account():
+    form = UpdateAccountForm()
+    if form.validate_on_submit():
+        # Validation & setting the picture-path
+        if form.picture.data:
+            pic_file = save_picture(form.picture.data)
+            current_user.image_file = pic_file
+        current_user.username = form.username.data
+        current_user.email = form.email.data
+        db.session.commit()
+        flash('Your Account has been updated!', 'info')
+        # Due to post-get-redirect pattern
+        return redirect(url_for('account'))
+    elif request.method == 'GET':
+        form.username.data = current_user.username
+        form.email.data = current_user.email
     image_file=url_for('static',filename='profile_pix/'+current_user.image_file)
-    return render_template('account.html',title='Account',image_file=image_file)
+    return render_template('account.html',title='Account',image_file=image_file, 
+                            form=form)
