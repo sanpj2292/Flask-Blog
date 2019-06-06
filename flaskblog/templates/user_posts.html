@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 
 {% block content %}
-    <h1>Home!!</h1>
+    <h1 class="mb-3">Posts by {{ user.username }} ({{ posts.total }})</h1>
     <!-- Templating Engine Jinja2 is being used by Flask -->
     {% for post in posts.items %}
         <article class="media content-section">
@@ -32,7 +32,7 @@
             {% else %}
                 {% set active_class = "btn btn-outline-info mb-4" %}
             {% endif %}
-            <a class="{{active_class}}" href="{{ url_for('home', page=page_num) }}">
+            <a class="{{active_class}}" href="{{ url_for('posts_by_user', username=user.username, page=page_num) }}">
                 {{ page_num }}
             </a>
         {% else %}

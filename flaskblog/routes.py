@@ -6,13 +6,26 @@ from flask_login import login_user, current_user, logout_user, login_required
 import secrets
 import os
 from PIL import Image
+import json
+
+
+def insert_data():
+    with open(os.path.join('flaskblog/data.json'),'r') as json_f:
+        posts = json.load(json_f)
+        for post in posts:
+            author = User.query.get(post['user_id'])
+            p = Post(title=post['title'],content=post['content'],author=author)
+            db.session.add(p)
+        db.session.commit()
 
 
 @app.route("/")
 @app.route("/home")
 def home():
-    posts = Post.query.all()
-    return render_template('home.html', posts=posts)
+    page = request.args.get('page', 1, type=int)
+    # insert_data()
+    posts = Post.query.order_by(Post.date_poster.desc()).paginate(page=page, per_page=5)
+    return render_template('home.html', posts=posts, active_page=page)
 
 @app.route('/about')
 def about():
@@ -133,3 +146,12 @@ def delete_post(post_id):
     db.session.commit()
     flash('Your message has been deleted!!', 'success')
     return redirect(url_for('home'))
+
+@app.route("/user/<string:username>")
+def posts_by_user(username):
+    page = request.args.get('page', 1, type=int)
+    user = User.query.filter_by(username=username).first_or_404()
+    posts = Post.query.filter_by(author=user)\
+        .order_by(Post.date_poster.desc())\
+        .paginate(page=page,per_page=5)
+    return render_template('user_posts.html', posts=posts, user=user, active_page=page)
