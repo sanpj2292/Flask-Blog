@@ -8,24 +8,10 @@ import os
 from PIL import Image
 
 
-posts = [
-    {
-        'author': 'San PJ',
-        'title': 'My Title',
-        'date_posted': '31st May, 2019',
-        'content': 'The first content I wrote'
-    },
-    {
-        'author': 'John Doe',
-        'title': 'His Title',
-        'date_posted': '25th March, 2019',
-        'content': 'The first content I wrote'
-    }
-]
-
 @app.route("/")
 @app.route("/home")
 def home():
+    posts = Post.query.all()
     return render_template('home.html', posts=posts)
 
 @app.route('/about')
@@ -109,3 +95,8 @@ def new_post():
         flash('Your Post has been created!!','success')
         return redirect(url_for('home'))
     return render_template('create_post.html', title='New Post', form=form)
+
+@app.route('/post/<int:post_id>')
+def post(post_id):
+    post = Post.query.get_or_404(post_id)
+    return render_template('post.html', title=post.title, post=post)
